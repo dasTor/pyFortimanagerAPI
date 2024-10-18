@@ -1,5 +1,6 @@
 __author__ = "Akshay Mane"
 
+import time
 from typing import List, Any, Optional
 from os.path import join, normpath
 import logging
@@ -29,7 +30,6 @@ class Lock:
         Lock or Unlock current Adom in FortiManager
         Adom has to be in workspace mode
         :param method: lock or unlock adom
-        :param name: Can lock specific adom using name as a filter
         :return: Response of status code (0=success) with data in JSON Format
         """
         url = f"dvmdb/adom/{self.adom}/workspace/{method}"
@@ -505,7 +505,7 @@ class FortiManager:
         if ipaddr == "":
             return None
 
-        login()
+        self.login()
 
         payload = \
         {
@@ -538,8 +538,8 @@ class FortiManager:
               ],
             "session": self.sessionid
         }
-        get_address_objects = session.post(
-            url=self.base_url, json=payload, verify=self.verify)
+        get_address_objects = self.session.post(
+            url=self.base_url, json=payload)
         return get_address_objects.json()["result"]
 
     def get_all_firewall_range_objects(self):
@@ -583,8 +583,8 @@ class FortiManager:
                 ],
                 "session": self.sessionid
             }
-        get_address_objects = session.post(
-            url=self.base_url, json=payload, verify=self.verify)
+        get_address_objects = self.session.post(
+            url=self.base_url, json=payload)
         return get_address_objects.json()["result"]
 
     def get_firewall_address_objects_by_fqdn(self, fqdn=""):
@@ -628,8 +628,8 @@ class FortiManager:
               ],
             "session": self.sessionid
         }
-        get_address_objects = session.post(
-            url=self.base_url, json=payload, verify=self.verify)
+        get_address_objects = self.session.post(
+            url=self.base_url, json=payload)
         return get_address_objects.json()["result"]
 
     def get_firewall_where_used_by_address_objects(self, address_name="", polling_amount=3):
@@ -649,7 +649,7 @@ class FortiManager:
         if address_name == "":
             return None
 
-        login()
+        self.login()
 
         payload = \
             {
@@ -666,8 +666,8 @@ class FortiManager:
                 "session": self.sessionid
             }
 
-        where_used_cache = session.post(
-            url=self.base_url, json=payload, verify=self.verify)
+        where_used_cache = self.session.post(
+            url=self.base_url, json=payload)
         where_used_json = where_used_cache.json()
 
         if where_used_json["result"][0]["status"]["code"] != 0:
@@ -696,8 +696,8 @@ class FortiManager:
                     "session": self.sessionid
                 }
 
-            where_used_summary = session.post(
-                url=self.base_url, json=payload, verify=self.verify)
+            where_used_summary = self.session.post(
+                url=self.base_url, json=payload)
 
             where_used_sum_json = where_used_summary.json()
 
@@ -723,8 +723,8 @@ class FortiManager:
                 "session": self.sessionid
             }
 
-        where_used_detail = session.post(
-            url=self.base_url, json=payload, verify=self.verify)
+        where_used_detail = self.session.post(
+            url=self.base_url, json=payload)
 
         return where_used_detail.json()["result"]
 
@@ -874,8 +874,8 @@ class FortiManager:
                                   "member": members,
                                   }]}],
             "session": self.sessionid}
-        add_dynamic_grp = session.post(
-            url=self.base_url, json=payload, verify=self.verify)
+        add_dynamic_grp = self.session.post(
+            url=self.base_url, json=payload)
         return add_dynamic_grp.json()["result"]
 
     def update_firewall_address_object(self, name, **data):
@@ -1367,7 +1367,7 @@ class FortiManager:
              "params": [{"url": f"pm/config/adom/{self.adom}/obj/firewall/service/group"}]}
 
         payload.update(session=self.sessionid)
-        services = session.post(url=self.base_url, json=payload, verify=self.verify)
+        services = self.session.post(url=self.base_url, json=payload)
         return services.json()["result"]
 
     def get_service_group(self, name):
@@ -1381,7 +1381,7 @@ class FortiManager:
              "params": [{"url": f"pm/config/adom/{self.adom}/obj/firewall/service/group/{name}"}]}
 
         payload.update(session=self.sessionid)
-        services = session.post(url=self.base_url, json=payload, verify=self.verify)
+        services = self.session.post(url=self.base_url, json=payload)
         return services.json()["result"]
 
     # Firewall Policies Methods
@@ -1672,8 +1672,8 @@ class FortiManager:
                 ],
                 "session": self.sessionid
             }
-        install_package = session.post(
-            url=self.base_url, json=payload, verify=self.verify)
+        install_package = self.session.post(
+            url=self.base_url, json=payload)
         return install_package.json()["result"]
 
     @staticmethod
@@ -2030,8 +2030,8 @@ class FortiManager:
                 "session": self.sessionid
             }
 
-        run_script = session.post(
-            url=self.base_url, json=payload, verify=self.verify)
+        run_script = self.session.post(
+            url=self.base_url, json=payload)
         return run_script.json()["result"]
 
     def quick_db_install(self, device_name: str, vdom: str):
@@ -2044,7 +2044,7 @@ class FortiManager:
             ],
             "session": self.sessionid
         }
-        quick_db_install = session.post(url=self.base_url, json=payload, verify=self.verify)
+        quick_db_install = self.session.post(url=self.base_url, json=payload)
         return quick_db_install.json()["result"]
 
     def track_quick_db_install(self, taskid):
@@ -2057,7 +2057,7 @@ class FortiManager:
                  ],
             "session": self.sessionid
         }
-        track_quick_db_install = session.post(url=self.base_url, json=payload, verify=False)
+        track_quick_db_install = self.session.post(url=self.base_url, json=payload, verify=False)
         return track_quick_db_install.json()["result"]
 
     def create_interface(self, device, name, interface, role, vdom, vlan, ip, mask, alias):
@@ -2082,7 +2082,7 @@ class FortiManager:
                              "vrf": 0}}],
                    "session": self.sessionid
                    }
-        create_interface = session.post(url=self.base_url, json=payload, verify=False)
+        create_interface = self.session.post(url=self.base_url, json=payload, verify=False)
         return create_interface.json()["result"]
 
     def create_zone(self, device_name, zone, vdom):
@@ -2093,7 +2093,7 @@ class FortiManager:
                         "data": {"name": zone, }}],
                    "session": self.sessionid
                    }
-        create_zone = session.post(url=self.base_url, json=payload, verify=False)
+        create_zone = self.session.post(url=self.base_url, json=payload, verify=False)
         return create_zone.json()["result"]
 
     def get_zones(self, device_name, vdom):
@@ -2104,7 +2104,7 @@ class FortiManager:
                    ],
                    "session": self.sessionid
                    }
-        get_zones = session.post(url=self.base_url, json=payload, verify=False)
+        get_zones = self.session.post(url=self.base_url, json=payload, verify=False)
         return get_zones.json()["result"]
 
     def get_zone(self, device_name, zone, vdom):
@@ -2115,7 +2115,7 @@ class FortiManager:
                    ],
                    "session": self.sessionid
                    }
-        get_zones = session.post(url=self.base_url, json=payload, verify=False)
+        get_zones = self.session.post(url=self.base_url, json=payload, verify=False)
         return get_zones.json()["result"]
 
     def assign_interfaces_to_zone(self, device_name, zone, interfaces_list: list, vdom):
@@ -2127,7 +2127,7 @@ class FortiManager:
                                  "interface": interfaces_list}}],
                    "session": self.sessionid
                    }
-        assign_interface_to_zone = session.post(url=self.base_url, json=payload, verify=False)
+        assign_interface_to_zone = self.session.post(url=self.base_url, json=payload, verify=False)
         return assign_interface_to_zone.json()["result"]
 
     def create_device_group(self, name, description=""):
@@ -2138,7 +2138,7 @@ class FortiManager:
                                         "meta fields": {}, "os_type": "fos"}}],
                    "session": self.sessionid
                    }
-        create_device_group = session.post(url=self.base_url, json=payload, verify=False)
+        create_device_group = self.session.post(url=self.base_url, json=payload, verify=False)
         return create_device_group.json()["result"]
 
     def add_device_to_group(self, group, device, vdom):
@@ -2149,7 +2149,7 @@ class FortiManager:
                         "data": [{"name": device, "vdom": vdom}]}],
             "session": self.sessionid
         }
-        add_device_in_group = session.post(url=self.base_url, json=payload, verify=False)
+        add_device_in_group = self.session.post(url=self.base_url, json=payload, verify=False)
         return add_device_in_group.json()["result"]
 
     def delete_device_to_group(self, group, device, vdom):
@@ -2160,7 +2160,7 @@ class FortiManager:
                         "data": [{"name": device, "vdom": vdom}]}],
             "session": self.sessionid
         }
-        delete_device_from_group = session.post(url=self.base_url, json=payload, verify=False)
+        delete_device_from_group = self.session.post(url=self.base_url, json=payload, verify=False)
         return delete_device_from_group.json()["result"]
 
     def get_device(self, device):
@@ -2171,7 +2171,7 @@ class FortiManager:
         payload = {"method": "get", "params": [
             {"url": f"/dvmdb/adom/{self.adom}/device/{device}"}]}
         payload.update({"session": self.sessionid})
-        get_device = session.post(
+        get_device = self.session.post(
             url=self.base_url, json=payload, verify=False)
         return get_device.json()
 
@@ -2179,7 +2179,6 @@ class FortiManager:
         """
         Create a script template and store it on FortiManager
         :param name: Specify a name for the script
-        :param script_content: write the cli commands
         :param target:
                 If Target = 0 than script runs on Device database
                 If Target = 1 than script runs on Remote FortiGate CLI
@@ -2197,7 +2196,7 @@ class FortiManager:
                               ],
                    "session": self.sessionid
                    }
-        create_script_group = session.post(url=self.base_url, json=payload, verify=self.verify)
+        create_script_group = self.session.post(url=self.base_url, json=payload)
         return create_script_group.json()["result"]
 
     def get_dhcp_servers(self, device, vdom):
@@ -2207,7 +2206,7 @@ class FortiManager:
                        "url": f"pm/config/device/{device}/vdom/{vdom}/system/dhcp/server"}],
                    "session": self.sessionid
                    }
-        get_dhcp_server = session.post(url=self.base_url, json=payload, verify=self.verify)
+        get_dhcp_server = self.session.post(url=self.base_url, json=payload)
         return get_dhcp_server.json()["result"]
 
     def __enter__(self):
