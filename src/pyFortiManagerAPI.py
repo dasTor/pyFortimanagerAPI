@@ -170,6 +170,28 @@ class FortiManager:
         )
         return get_adoms.json()["result"]
 
+    def clone_adom(self, name):
+        """
+        clone existing adom from the FortiManager into a new one
+        :param name: name of the new adom
+        :return: Response of status code with data in JSON Format
+        """
+        payload = {
+            "method": "clone",
+            "params": [
+                {
+                    "url": f"/dvmdb/adom/{self.adom}",
+                    "data": {
+                        "name": f"{name}"
+                    }
+                }
+            ]
+        }
+
+        payload.update({"session": self.sessionid})
+        clone_adom = self.session.post(url=self.base_url, json=payload)
+        return clone_adom.json()
+
     def get_lock(self, adom: str = None):
         """
         Generate a Lock for the specified adom
@@ -457,6 +479,19 @@ class FortiManager:
         get_address_objects = self.session.post(url=self.base_url, json=payload)
         return get_address_objects.json()["result"]
 
+    # Firewall Object v6 Methods
+    def get_firewall_address_v6_objects(self, name=False):
+        """
+        Get all the address v6 objects data stored in FortiManager
+        :return: Response of status code with data in JSON Format
+        """
+        url = f"pm/config/adom/{self.adom}/obj/firewall/address6"
+        if name:
+            url = f"pm/config/adom/{self.adom}/obj/firewall/address6/{name}"
+        payload = {"method": "get", "params": [{"url": url}], "session": self.sessionid}
+        get_address_objects = self.session.post(url=self.base_url, json=payload)
+        return get_address_objects.json()["result"]
+
     def get_firewall_address_objects_by_ipaddress(self, ipaddr="", mask="255.255.255.255"):
         """
         Get all the address objects data stored in FortiManager
@@ -597,7 +632,6 @@ class FortiManager:
             url=self.base_url, json=payload, verify=self.verify)
         return get_address_objects.json()["result"]
 
-    #
     def get_firewall_where_used_by_address_objects(self, address_name="", polling_amount=3):
         """
             Get all the objects (eg. policies) data stored in FortiManager
@@ -693,19 +727,6 @@ class FortiManager:
             url=self.base_url, json=payload, verify=self.verify)
 
         return where_used_detail.json()["result"]
-
-    # Firewall Object v6 Methods
-    def get_firewall_address_v6_objects(self, name=False):
-        """
-        Get all the address v6 objects data stored in FortiManager
-        :return: Response of status code with data in JSON Format
-        """
-        url = f"pm/config/adom/{self.adom}/obj/firewall/address6"
-        if name:
-            url = f"pm/config/adom/{self.adom}/obj/firewall/address6/{name}"
-        payload = {"method": "get", "params": [{"url": url}], "session": self.sessionid}
-        get_address_objects = self.session.post(url=self.base_url, json=payload)
-        return get_address_objects.json()["result"]
 
     def add_firewall_address_object(
         self,

@@ -2,7 +2,7 @@
 
 A Python wrapper for the FortiManager JSON RPC API.
 
-[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues) [![Upload Python Package](https://github.com/akshaymane920/pyFortimanagerAPI/actions/workflows/python-publish.yml/badge.svg)](https://github.com/akshaymane920/pyFortimanagerAPI/actions/workflows/python-publish.yml)  
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues) [![Upload Python Package](https://github.com/akshaymane920/pyFortimanagerAPI/actions/workflows/python-publish.yml/badge.svg)](https://github.com/akshaymane920/pyFortimanagerAPI/actions/workflows/python-publish.yml)
 ### *** Video Tutorial to use the package is available on [YouTube](https://www.youtube.com/watch?v=4o7-AYPwuSM) ***
 
 ## Installation
@@ -19,7 +19,7 @@ pip install pyFortiManagerAPI
 
 ```python
 import pyFortiManagerAPI
-fortimngr = pyFortiManagerAPI.FortiManager(host="", 
+fortimngr = pyFortiManagerAPI.FortiManager(host="",
                                            username="",
                                            password="")
 ```
@@ -57,7 +57,22 @@ Optional settings:
 - ## Parameters
 * name of the admon you want to switch to.
 
-### 3) Lock Adom (in workspace mode)
+### 3) Clone Adom
+```python
+>>> fortimngr.clone_adom(name="ClonedFromAnotherAdom")
+```
+- ## Parameters
+* name: name of new adom
+
+### 4) Lock Adom (in workspace mode)
+deprecated! use Contextmanager instead:
+```
+with FortiManager([data]) as fm:
+    adm_lock = fm.get_lock()  # can pass an ADOM name to get a lock for that ADOM
+    with adm_lock:
+        do_stuff()
+```
+
 ```python
 >>> fortimngr.lock_adom()
 ```
@@ -67,7 +82,15 @@ Optional settings:
 - ## Parameters
 * name: Can lock specific adom using name as a filter.
 
-### 4) Unlock Adom (in workspace mode)
+### 5) Unlock Adom (in workspace mode)
+deprecated! use Contextmanager instead:
+```
+with FortiManager([data]) as fm:
+    adm_lock = fm.get_lock()  # can pass an ADOM name to get a lock for that ADOM
+    with adm_lock:
+        do_stuff()
+```
+
 ```python
 >>> fortimngr.unlock_adom()
 ```
@@ -78,7 +101,7 @@ Optional settings:
 * name: Can lock specific adom using name as a filter.
 
 # User Operations : Policy Package
-### 5) Get all the policy packages configured on FortiManager.
+### 6) Get all the policy packages configured on FortiManager.
 ```python
 >>> fortimngr.get_policy_packages()
 ```
@@ -89,7 +112,7 @@ Optional settings:
 * name: Can get specific package using name as a filter.
 
 
-### 6) Add your own policy package in FortiManager.
+### 7) Add your own policy package in FortiManager.
 ```python
 >>> fortimngr.add_policy_package(name="TestPackage")
 ```
@@ -99,19 +122,19 @@ Optional settings:
 
 # User Operations : Address Objects
 
-### 7) Get all address objects from FortiManager.
+### 8) Get all address objects from FortiManager.
 
 ```python
 >>> fortimngr.get_firewall_address_objects()
 ```
 
-### 7bis) Get all v6 address objects from FortiManager.
+### 8bis) Get all v6 address objects from FortiManager.
 
 ```python
 >>> fortimngr.get_firewall_address_v6_objects()
 ```
 
-### 8) Get specific address object from FortiManager.
+### 9) Get specific address object from FortiManager.
 
 ```python
 >>> fortimngr.get_firewall_address_objects(name="YourObjectName")
@@ -122,7 +145,45 @@ Optional settings:
 
 * name: Specify object name that you want to see.
 
-### 9) Create an address object.
+### 10) Get all address objects matching an ip address from FortiManager.
+
+```python
+>>> fortimngr.get_firewall_address_objects_by_ipaddress(ipaddr="192.168.0.1")
+```
+
+- ## Parameters
+
+* ipaddr: valid ip address
+* mask: Netmask, defaults to 255.255.255.255
+
+### 11) Get all address objects of type ipRange
+
+```python
+>>> fortimngr.get_all_firewall_range_objects()
+```
+
+### 12) Get all address objects matching an fqdn from FortiManager.
+
+```python
+>>> fortimngr.get_firewall_address_objects_by_fqdn(fqdn="gmail.com")
+```
+
+- ## Parameters
+
+* fqdn: Fully Qualified Domain Name
+
+### 13) Get all usages of an address object
+
+```python
+>>> fortimngr.get_firewall_where_used_by_address_objects(address_name="gmail")
+```
+
+- ## Parameters
+
+* address_name: 'name' attribute of an object that exists in current adom
+* polling_amount: multiple of .5 seconds to wait for fortimgr cache, default: 3
+
+### 14) Create an address object.
 
 ```python
 >>> fortimngr.add_firewall_address_object(name="TestObject",
@@ -137,7 +198,7 @@ Optional settings:
 * associated_interface: Provide interface to which this object belongs if any. {Default is kept any}
 * subnet: Specify the subnet in a list format eg.["1.1.1.1", "255.255.255.255"]
 
-### 9bis) Create an v6 address object.
+### 14bis) Create an v6 address object.
 
 ```python
 >>> fortimngr.add_firewall_address_v6_object(name="TestObject",
@@ -151,7 +212,7 @@ Optional settings:
 * associated_interface: Provide interface to which this object belongs if any. {Default is kept any}
 * subnet: Specify the subnet in a list format eg.["1.1.1.1", "255.255.255.255"]
 * subnet6 : Specify the subnet IPv6 in a string format eg. "2001:0001::1/128"
-### 10) Update address object.
+### 15) Update address object.
 
 ```python
 >>> fortimngr.update_firewall_address_object(name="TestObject",
@@ -170,7 +231,7 @@ Optional settings:
 * name: Enter the name of the object that needs to be updated
 * data: You can get the **kwargs parameters with "show_params_for_object_update()" method or "
 
-### 11) Delete address object.
+### 16) Delete address object.
 
 ```python
 >>> fortimngr.delete_firewall_address_object(object_name="TestObject")
@@ -184,14 +245,14 @@ Optional settings:
 
 # User Operations : Address Groups
 
-### 12) Get all address groups.
+### 17) Get all address groups.
 
 ```python
 >>> fortimngr.get_address_groups()
 >>> fortimngr.get_address_v6_groups()
 ```
 
-### 13) Get specific address group.
+### 18) Get specific address group.
 
 ```python
 >>> fortimngr.get_address_groups(name="TestGroup")
@@ -202,10 +263,10 @@ Optional settings:
 
 * name: Specify the name the address group.
 
-### 14) Create your own address group.
+### 19) Create your own address group.
 
 ```python
->>> fortimngr.add_address_group(name="Test_Group",                                
+>>> fortimngr.add_address_group(name="Test_Group",
                                 members=["TestObject1"])
 >>> fortimngr.add_address_v6_group(name="Test_Group",
                                 members=["TestObject1"])
@@ -217,7 +278,7 @@ Optional settings:
 * members: pass your object names as members in a list eg. ["TestObject1", "TestObject2"]
   > Note: An address group should consist atleast 1 member.
 
-### 15) Update the address group.
+### 20) Update the address group.
 
 ```python
 >>> fortimngr.update_address_group(name="Test_Group",
@@ -236,7 +297,7 @@ Optional settings:
   do="add" will add the object in the address group
   do="remove" will remove the object from address group
 
-### 16) Delete the address group.
+### 21) Delete the address group.
 
 ```python
 >>> fortimngr.delete_address_group(name="Test_group")
@@ -250,7 +311,7 @@ Optional settings:
 ---
 # User Operations : VirtualIP Objects
 
-### 17) Get all VIP objects from FortiManager.
+### 22) Get all VIP objects from FortiManager.
 
 ```python
 >>> fortimngr.get_firewall_vip_objects()
@@ -260,25 +321,25 @@ Optional settings:
 
 # User Operations : Add Devices
 
-### 18) Add devices to FortiManager.
+### 23) Add devices to FortiManager.
 
 Add an existing device:
 
 ```python
->>> fortimngr.add_device(ip_address="192.168.0.100", 
-                         username="admin", 
-                         password="", 
-                         name="FortiGateVM64", 
+>>> fortimngr.add_device(ip_address="192.168.0.100",
+                         username="admin",
+                         password="",
+                         name="FortiGateVM64",
                          description=False)
 ```
 
 or model a device that is to be deployed:
 
 ```python
->>> fortimngr.add_model_device(serial_no="FGTxxxxxxxx", 
+>>> fortimngr.add_model_device(serial_no="FGTxxxxxxxx",
                          name="FortiGateVM64")
-                         username="admin", 
-                         password="", 
+                         username="admin",
+                         password="",
 ```
 Required arguments:
 * serial_no
@@ -292,7 +353,7 @@ Optional arguments:
 * mr (default=4)
 * platform_str (default "", "FortiGate-VM64" for virtual Fortigate)
 
-### 19) Get devices From FortiManager.
+### 24) Get devices From FortiManager.
 
 ```python
 >>> fortimngr.get_devices()
@@ -301,14 +362,14 @@ Optional arguments:
 
 # User Operations : Meta Data
 
-### 20) Get Meta Data From FortiManager.
+### 25) Get Meta Data From FortiManager.
 ```python
 >>> fortimngr.get_meta_data()
 ```
 
-### 21) Add Meta Data to FortiManager.
+### 26) Add Meta Data to FortiManager.
 ```python
->>> fortimngr.add_meta_data(name="Meta_Data_1", 
+>>> fortimngr.add_meta_data(name="Meta_Data_1",
                             status=1)
 ```
 
@@ -316,10 +377,10 @@ Optional arguments:
 * :param name: name of the meta tag
 * :param status: status of meta tag whether it should be active(1) or disabled(0)
 
-### 22) Assign Meta Data to a FortiGate.
+### 27) Assign Meta Data to a FortiGate.
 ```python
->>> fortimngr.assign_meta_to_device(device="FortiGateVM64", 
-                                    meta_name="Meta_Data_1", 
+>>> fortimngr.assign_meta_to_device(device="FortiGateVM64",
+                                    meta_name="Meta_Data_1",
                                     meta_value="192.168.0.1/24")
 ```
 ## Parameters
@@ -329,11 +390,11 @@ Optional arguments:
 * :param meta_value: value of the meta tag
 # User Operations : Policies
 
-### 23) Assign Meta Data to a FortiGate VDOM.
+### 28) Assign Meta Data to a FortiGate VDOM.
 ```python
 >>> fortimngr.assign_meta_to_device_vdom(device="FortiGateVM64",
                                          vdom="vdom",
-                                         meta_name="Meta_Data_1", 
+                                         meta_name="Meta_Data_1",
                                          meta_value="192.168.0.1/24")
 ```
 ## Parameters
@@ -344,7 +405,7 @@ Optional arguments:
 * :param meta_value: value of the meta tag
 # User Operations : Policies
 
-### 24) Get all the policies in your Policy Package.
+### 29) Get all the policies in your Policy Package.
 
 ```python
 >>> fortimngr.get_firewall_policies(policy_package_name="YourPolicyPackageName")
@@ -354,7 +415,7 @@ Optional arguments:
 
 * policy_package_name: Enter the policy package name.
 
-### 25) Get specific policiy in your Policy Package using PolicyID filter.
+### 30) Get specific policiy in your Policy Package using PolicyID filter.
 
 ```python
 >>> fortimngr.get_firewall_policies(policy_package_name="YourPolicyPackageName", policyid=3)
@@ -365,23 +426,23 @@ Optional arguments:
 * policy_package_name: Enter the policy package name.
 * policyid: Can filter and get the policy you want using policyID
 
-### 26) Get global header policy
+### 31) Get global header policy
 
 fortimngr.get_global_header_policies
 
-### 27) Get header policy
+### 32) Get header policy
 
 fortimngr.get_firewall_header_policies
 
-### 28) Get global footer policy
+### 33) Get global footer policy
 
 fortimngr.get_global_footer_policies
 
-### 29) Get footer policy
+### 34) Get footer policy
 
 fortimngr.get_firewall_footer_policies
 
-### 30) Create your own policy in your Policy Package.
+### 35) Create your own policy in your Policy Package.
 
 ```python
 >>> fortimngr.add_firewall_policy(policy_package_name="YourPolicyPackageName",
@@ -426,7 +487,7 @@ fortimngr.get_firewall_footer_policies
                    logtraffic=2  Means Log All Sessions
 
 
-### 31) Update the policy in your Policy Package.
+### 36) Update the policy in your Policy Package.
 
 ```python
 >>> fortimngr.update_firewall_policy(policy_package_name="YourPolicyPackageName",
@@ -443,7 +504,7 @@ fortimngr.get_firewall_footer_policies
 * data: You can get the **kwargs parameters with "show_params_for_policy_update()" method
 
 
-### 32) Delete the policy in your Policy Package.
+### 37) Delete the policy in your Policy Package.
 
 ```python
 >>> fortimngr.delete_firewall_policy(policy_package_name="YourPolicyPackageName",
@@ -458,12 +519,12 @@ fortimngr.get_firewall_footer_policies
 
 
 
-### 33) Move Firewall Policy.
+### 38) Move Firewall Policy.
 
 ```python
 >>> fortimngr.move_firewall_policy(policy_package_name="LocalLab",
-                                   move_policyid=10, 
-                                   option="after", 
+                                   move_policyid=10,
+                                   option="after",
                                    policyid=2)
 ```
 - ## Parameters
@@ -476,18 +537,18 @@ fortimngr.get_firewall_footer_policies
 
 # User Operations : Installing the Policy Package.
 
-### 34) Installing the Policy Package.
+### 39) Installing the Policy Package.
 
 ```python
 >>> fortimngr.install_policy_package(package_name="Your Policy Package name")
 
 ```
 
-### 35) Adding Installation Targets to a Policy Package.
+### 40) Adding Installation Targets to a Policy Package.
 
 ```python
->>> fortimngr.add_install_target(device_name="FortiGateVM64", 
-                                 pkg_name="Test_Policy_Pakage", 
+>>> fortimngr.add_install_target(device_name="FortiGateVM64",
+                                 pkg_name="Test_Policy_Pakage",
                                  vdom="root")
 ```
 - ## Parameters
@@ -500,7 +561,7 @@ fortimngr.get_firewall_footer_policies
 
 # Show Params for updation of Policies and Objects.
 
-### 36) Parameters for updating Address Object.
+### 41) Parameters for updating Address Object.
 
 ```python
 >>> fortimngr.show_params_for_object_update()
@@ -515,7 +576,7 @@ fortimngr.get_firewall_footer_policies
         subnet[list]                : IP/Netmask
         object_type(int)            : Type
 
-### 37) Parameters for updating Policy.
+### 42) Parameters for updating Policy.
 
 ```python
 >>> fortimngr.show_params_for_policy_update()
@@ -536,11 +597,11 @@ fortimngr.get_firewall_footer_policies
 
 # User Operations : Adding scripts in Fortimanager.
 
-### 38) Add a script in FortiManager's Database.
+### 43) Add a script in FortiManager's Database.
 
 ```python
->>> fortimngr.create_script(name="Test Script Template", 
-                            script_content="config system interface \n edit port 1 \n set ip 1.1.1.1/24", 
+>>> fortimngr.create_script(name="Test Script Template",
+                            script_content="config system interface \n edit port 1 \n set ip 1.1.1.1/24",
                             target=0)
 ```
 - ## Parameters
@@ -556,13 +617,13 @@ fortimngr.get_firewall_footer_policies
 ```
 
 
-### 39) Get all scripts from FortiManager's Database.
+### 44) Get all scripts from FortiManager's Database.
 
 ```python
 >>> fortimngr.get_all_scripts()
 ```
 
-### 40) Delete a script from FortiManager's Database.
+### 45) Delete a script from FortiManager's Database.
 
 ```python
 >>> fortimngr.delete_script(name="Test Script Template")
@@ -571,11 +632,11 @@ fortimngr.get_firewall_footer_policies
 
 * :param name: Specify a name for the script tha need to be deleted.
 
-### 41) Run a script on FortiManager's Database/ FortiGate's Remote CLI.
+### 46) Run a script on FortiManager's Database/ FortiGate's Remote CLI.
 
 ```python
->>> fortimngr.run_script_on_single_device(script_name="test_script", 
-                                          device_name="FortiGate-VM64", 
+>>> fortimngr.run_script_on_single_device(script_name="test_script",
+                                          device_name="FortiGate-VM64",
                                           vdom="root")
 ```
 - ## Parameters
@@ -586,7 +647,7 @@ fortimngr.get_firewall_footer_policies
 
 
 ```python
->>> fortimngr.run_script_on_multiple_devices(script_name="test_script", 
+>>> fortimngr.run_script_on_multiple_devices(script_name="test_script",
                                              devices=[{"name":"FortiGate-VM64", "vdom": "root"},
                                                       {"name":"Test-FortiGate-VM64", "vdom": "global"},
                                                       {"name":"Test-2-FortiGate-VM64", "vdom": "Test"}])
@@ -599,15 +660,15 @@ fortimngr.get_firewall_footer_policies
                            {"name": "FortiGateVM64-2", "vdom": "test"}
                            {"name": "FortiGateVM64-3", "vdom": "root"}]
 
-```  
+```
 * :param script_name: Specify the script name that should be executed on the specified devices
 
-### 42) Backup FortiGate's configuration from FortiManager and store it in TFTP server.
+### 47) Backup FortiGate's configuration from FortiManager and store it in TFTP server.
 
 ```python
->>> fortimngr.backup_config_of_fortiGate_to_tftp(tftp_ip="1.1.1.1", 
-                                                 path="/FortiGate_backups", 
-                                                 filename="FortiGate.conf", 
+>>> fortimngr.backup_config_of_fortiGate_to_tftp(tftp_ip="1.1.1.1",
+                                                 path="/FortiGate_backups",
+                                                 filename="FortiGate.conf",
                                                  device_name="FortiGate-VM64", vdom="root")
 
 ```
@@ -623,13 +684,13 @@ This function leverages **_create_script()_** and **_run_script_on_single_device
 
 # User Operations : Working with services
 
-### 43) Get all services
+### 48) Get all services
 
 ```python
 >>> fortimngr.get_services()
 ```
 
-### 44) Get single service by name
+### 49) Get single service by name
 
 ```python
 >>> fortimngr.get_service("RDP")
@@ -637,13 +698,13 @@ This function leverages **_create_script()_** and **_run_script_on_single_device
 
 # User Operations : Working with service groups
 
-### 45) Get all service groups
+### 50) Get all service groups
 
 ```python
 >>> fortimngr.get_service_groups()
 ```
 
-### 46) Get single service group by name
+### 51) Get single service group by name
 
 ```python
 >>> fortimngr.get_service_group("Web Access")
